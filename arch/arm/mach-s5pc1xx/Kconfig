@@ -12,6 +12,13 @@ config TARGET_SMDKC100
 	bool "Support smdkc100 board"
 	select OF_CONTROL
 
+config TARGET_OK210
+	bool "Support ok210 board"
+	select OF_CONTROL
+	select SPL
+	help
+		Support Forlinx OK210 platform based on Samsung s5pv210
+
 endchoice
 
 config SYS_SOC
@@ -19,5 +26,6 @@ config SYS_SOC
 
 source "board/samsung/goni/Kconfig"
 source "board/samsung/smdkc100/Kconfig"
+source "board/samsung/ok210/Kconfig"
 
 endif

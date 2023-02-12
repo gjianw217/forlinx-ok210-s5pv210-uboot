@@ -1,0 +1,15 @@
+if TARGET_OK210
+
+config SYS_BOARD
+	default "ok210"
+
+config SYS_VENDOR
+	default "samsung"
+
+config SYS_SOC
+	default "s5pc1xx"
+
+config SYS_CONFIG_NAME
+	default "ok210"
+
+endif

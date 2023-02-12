@@ -1,0 +1,6 @@
+OK210 BOARD
+M:	koudaiwulian <gjianw217@163.com>
+S:	Maintained
+F:	board/samsung/ok210/
+F:	include/configs/ok210.h
+F:	configs/ok210_defconfig
