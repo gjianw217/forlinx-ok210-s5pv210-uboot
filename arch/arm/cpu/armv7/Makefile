@@ -11,7 +11,6 @@ obj-y	+= cache_v7.o cache_v7_asm.o
 
 obj-y	+= cpu.o cp15.o
 obj-y	+= syslib.o
-obj-y   += led.o
 
 ifneq ($(CONFIG_AM43XX)$(CONFIG_AM33XX)$(CONFIG_OMAP44XX)$(CONFIG_OMAP54XX)$(CONFIG_TEGRA)$(CONFIG_MX6)$(CONFIG_MX7)$(CONFIG_TI81XX)$(CONFIG_AT91FAMILY)$(CONFIG_SUNXI)$(CONFIG_ARCH_SOCFPGA),)
 ifneq ($(CONFIG_SKIP_LOWLEVEL_INIT),y)

@@ -33,7 +33,6 @@
 
 reset:
 	/* Allow the board to save important registers */
-	bl led_flash
 	b	save_boot_params
 save_boot_params_ret:
 	/*
