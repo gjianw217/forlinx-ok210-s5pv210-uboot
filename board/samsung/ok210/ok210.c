@@ -181,7 +181,7 @@ int board_init(void)
 int dram_init(void)
 {
 	gd->ram_size = get_ram_size((long *)PHYS_SDRAM_1, PHYS_SDRAM_1_SIZE);
-
+	gd->ram_size += get_ram_size((long *)PHYS_SDRAM_2, PHYS_SDRAM_2_SIZE);
 	return 0;
 }
 
@@ -189,12 +189,15 @@ void dram_init_banksize(void)
 {
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
 	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
+	
+	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
+	gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
 }
 
 #ifdef CONFIG_DISPLAY_BOARDINFO
 int checkboard(void)
 {
-	printf("Board:\tSMDKC100\n");
+	printf("Board:\tForlinx OK210\n");
 	return 0;
 }
 #endif
