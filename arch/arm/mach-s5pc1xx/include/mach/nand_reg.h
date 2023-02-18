@@ -1,4 +1,4 @@
-/* add by zjh*/
+/* add by gjianw217*/
 
 #ifndef __ASM_ARM_ARCH_NAND_REG_H_
 #define __ASM_ARM_ARCH_NAND_REG_H_

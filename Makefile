@@ -729,7 +729,7 @@ DO_STATIC_RELA =
 endif
 
 # Always append ALL so that arch config.mk's can add custom ones
-ALL-y += u-boot.srec u-boot.bin u-boot.sym System.map u-boot.cfg binary_size_check
+ALL-y += u-boot.srec u-boot.bin u-boot.sym System.map u-boot.cfg binary_size_check combine
 
 ALL-$(CONFIG_ONENAND_U_BOOT) += u-boot-onenand.bin
 ifeq ($(CONFIG_SPL_FSL_PBL),y)
@@ -755,6 +755,16 @@ endif
 ALL-$(CONFIG_REMAKE_ELF) += u-boot.elf
 ALL-$(CONFIG_EFI_APP) += u-boot-app.efi
 ALL-$(CONFIG_EFI_STUB) += u-boot-payload.efi
+
+# by gjianw217
+combine:u-boot.bin spl/$(BOARD)-spl.bin
+	$(Q)cp $(objtree)/spl/$(BOARD)-spl.bin $(objtree)/tmp.bin
+	$(Q)truncate $(objtree)/tmp.bin -c -s 16K
+	$(Q)cat $(objtree)/u-boot.bin >> $(objtree)/tmp.bin
+	$(Q)cp $(objtree)/tmp.bin $(objtree)/$(BOARD)-u-boot.bin
+	$(Q)mkdir -p $(objtree)/../tftp/
+	cp -rf $(objtree)/$(BOARD)-u-boot.bin $(objtree)/../tftp/
+
 
 ifneq ($(BUILD_ROM),)
 ALL-$(CONFIG_X86_RESET_VECTOR) += u-boot.rom

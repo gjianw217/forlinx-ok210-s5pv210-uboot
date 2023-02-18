@@ -139,10 +139,10 @@
 /*-----------------------------------------------------------------------
  * Boot configuration
  */
-#define CONFIG_ENV_IS_IN_NAND
-#define CONFIG_ENV_SIZE			(128 << 10)	/* 128KiB, 0x20000 */
-#define CONFIG_ENV_ADDR			(256 << 10)	/* 256KiB, 0x40000 */
-#define CONFIG_ENV_OFFSET		(256 << 10)	/* 256KiB, 0x40000 */
+#define CONFIG_ENV_IS_IN_NAND	1
+#define CONFIG_ENV_SIZE			(512 << 10)	/* 512KiB, 0x80000 */
+#define CONFIG_ENV_ADDR			(1 << 20)	/* 1MB, 0x100000 */
+#define CONFIG_ENV_OFFSET		(1 << 20)	/* 1MB, 0x100000 */
 
 
 #define CONFIG_DOS_PARTITION		1

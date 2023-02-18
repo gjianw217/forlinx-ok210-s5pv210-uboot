@@ -12,7 +12,7 @@
 #include <asm/arch/sromc.h>
 #include <netdev.h>
 #include <asm/arch/clock.h>	
-
+#include <asm/arch/nand_reg.h>	
 DECLARE_GLOBAL_DATA_PTR;
 
 #define GPH2CON   	0xE0200C40
@@ -56,8 +56,43 @@ void copy_bl2_to_ram(void)
 */
 	u32 OM = *(volatile u32 *)(0xE0000004);	// OM Register
 	OM &= 0x1F;					// 取低5位
+	if (OM == 0x2)				// NAND 2 KB, 5cycle 8-bit ECC
+	{
+		u32 cfg = 0;
+		struct s5pv210_nand *nand_reg = (struct s5pv210_nand *)(struct s5pv210_nand *)samsung_get_base_nand();
+		
+		/* initialize hardware */
+		/* HCLK_PSYS=133MHz(7.5ns) */
+		cfg =	(0x1 << 23) |	/* Disable 1-bit and 4-bit ECC */
+				/* 下面3个时间参数稍微比计算出的值大些（我这里依次加1），否则读写不稳定 */
+				(0x3 << 12) |	/* 7.5ns * 2 > 12ns tALS tCLS */
+				(0x2 << 8) | 	/* (1+1) * 7.5ns > 12ns (tWP) */
+				(0x1 << 4) | 	/* (0+1) * 7.5 > 5ns (tCLH/tALH) */
+				(0x0 << 3) | 	/* SLC NAND Flash */
+				(0x0 << 2) |	/* 2KBytes/Page */
+				(0x1 << 1);		/* 5 address cycle */
 	
-	if (OM == 0xC)		// SD/MMC
+		writel(cfg, &nand_reg->nfconf);
+		
+		writel((0x1 << 1) | (0x1 << 0), &nand_reg->nfcont);/* Disable chip select and Enable NAND Flash Controller */
+	#define NF8_ReadPage_Adv(a,b,c) (((int(*)(u32, u32, u8*))(*((u32 *)0xD0037F90)))(a,b,c))	
+	#define MP0_1CON  (*(volatile u32 *)0xE02002E0)
+	#define	MP0_3CON  (*(volatile u32 *)0xE0200320)
+	#define	MP0_6CON  (*(volatile u32 *)0xE0200380)	
+		/* Config GPIO */
+		MP0_1CON &= ~(0xFFFF << 8);
+		MP0_1CON |= (0x3333 << 8);
+		MP0_3CON = 0x22222222;
+		MP0_6CON = 0x22222222;		
+		
+		int i = 0;
+		int pages = BL2_SIZE / 2048;		// 多少页
+		int offset = BL1_SIZE /2048;			// u-boot.bin在NAND中的偏移地址(页地址)
+		u8 *p = (u8 *)CONFIG_SYS_TEXT_BASE;
+		for (; i < pages; i++, p += 2048, offset += 1)
+			NF8_ReadPage_Adv(offset / 64, offset % 64, p);
+	}
+	else if (OM == 0xC)		// SD/MMC
 	{
 		u32 S5PV210_SDMMC_BASE = *(volatile u32 *)(0xD0037488);	// S5PV210_SDMMC_BASE
 		u8 ch = 0;
