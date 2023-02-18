@@ -21,7 +21,11 @@ lowlevel_init:
 	mov	r9, lr
 
 	#ifdef CONFIG_SPL_BUILD
+	#if 0
 	bl system_clock_init
+	#else
+	bl clock_init
+	#endif
 	bl sdram_init
 	#else
 	

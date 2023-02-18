@@ -11,6 +11,7 @@
 #include <asm/io.h>
 #include <asm/arch/sromc.h>
 #include <netdev.h>
+#include <asm/arch/clock.h>	
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -94,7 +95,51 @@ void board_init_f(ulong bootflag)
 void clock_init(void)
 {
 	u32 val = 0;
+	struct s5pv210_clock *const clock = (struct s5pv210_clock *)samsung_get_base_clock();
 	
+	/* 1.设置PLL锁定值 */
+	writel(0xFFFF, &clock->apll_lock);
+	writel(0xFFFF, &clock->mpll_lock);
+	writel(0xFFFF, &clock->epll_lock);
+	writel(0xFFFF, &clock->vpll_lock);
+	
+	/* 2.设置PLL的PMS值(使用芯片手册推荐的值)，并使能PLL */
+	/*	 	P	  	    M   		  S		     EN	*/
+	writel((3  << 8) | (125 << 16) | (1 << 0) | (1 << 31), &clock->apll_con0);	/* FOUT_APLL = 1000MHz */
+	writel((12 << 8) | (667 << 16) | (1 << 0) | (1 << 31), &clock->mpll_con); 	/* FOUT_MPLL = 667MHz */
+	writel((3  << 8) | (48  << 16) | (2 << 0) | (1 << 31), &clock->epll_con0);	/* FOUT_EPLL = 96MHz */
+	writel((6  << 8) | (108 << 16) | (3 << 0) | (1 << 31), &clock->vpll_con);	/* FOUT_VPLL = 54MHz */
+	
+	/* 3.等待PLL锁定 */
+	while (!(readl(&clock->apll_con0) & (1 << 29)));
+	while (!(readl(&clock->mpll_con) & (1 << 29)));
+	while (!(readl(&clock->apll_con0) & (1 << 29)));
+	while (!(readl(&clock->epll_con0) & (1 << 29)));
+	while (!(readl(&clock->vpll_con) & (1 << 29)));
+
+	/* 
+	** 4.设置系统时钟源，选择PLL为时钟输出 */
+	/* MOUT_MSYS = SCLKAPLL = FOUT_APLL = 1000MHz
+	** MOUT_DSYS = SCLKMPLL = FOUT_MPLL = 667MHz
+	** MOUT_PSYS = SCLKMPLL = FOUT_MPLL = 667MHz
+	** ONENAND = HCLK_PSYS
+	*/
+	writel((1 << 0) | (1 << 4) | (1 << 8) | (1 << 12), &clock->src0);
+	
+	/* 4.设置其他模块的时钟源 */
+
+	/* 6.设置系统时钟分频值 */
+	val = 	(0 << 0)  |	/* APLL_RATIO = 0, freq(ARMCLK) = MOUT_MSYS / (APLL_RATIO + 1) = 1000MHz */
+			(4 << 4)  |	/* A2M_RATIO = 4, freq(A2M) = SCLKAPLL / (A2M_RATIO + 1) = 200MHz */
+			(4 << 8)  |	/* HCLK_MSYS_RATIO = 4, freq(HCLK_MSYS) = ARMCLK / (HCLK_MSYS_RATIO + 1) = 200MHz */
+			(1 << 12) |	/* PCLK_MSYS_RATIO = 1, freq(PCLK_MSYS) = HCLK_MSYS / (PCLK_MSYS_RATIO + 1) = 100MHz */
+			(3 << 16) | /* HCLK_DSYS_RATIO = 3, freq(HCLK_DSYS) = MOUT_DSYS / (HCLK_DSYS_RATIO + 1) = 166MHz */
+			(1 << 20) | /* PCLK_DSYS_RATIO = 1, freq(PCLK_DSYS) = HCLK_DSYS / (PCLK_DSYS_RATIO + 1) = 83MHz */
+			(4 << 24) |	/* HCLK_PSYS_RATIO = 4, freq(HCLK_PSYS) = MOUT_PSYS / (HCLK_PSYS_RATIO + 1) = 133MHz */
+			(1 << 28);	/* PCLK_PSYS_RATIO = 1, freq(PCLK_PSYS) = HCLK_PSYS / (PCLK_PSYS_RATIO + 1) = 66MHz */
+	writel(val, &clock->div0);
+	
+	/* 7.设置其他模块的时钟分频值 */
 }
 
  
