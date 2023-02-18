@@ -30,15 +30,53 @@ void s5pv210_early_debug(int debug_code)
 
 #ifdef CONFIG_SPL_BUILD
  
+#define CopySDMMCtoMem(ch, sb, bs, dst, i) \
+	(((u8(*)(int, u32, unsigned short, u32*, u8))\
+	(*((u32 *)0xD0037F98)))(ch, sb, bs, dst, i))
+	
+#define SD_SECTOR_SIZE 		512
+
+#define BL1_START_SECTOR	1
+#define BL1_SECTOR_NUM		32
+#define BL1_SIZE			(BL1_SECTOR_NUM*SD_SECTOR_SIZE)	/*16KB*/
+
+#define BL2_START_SECTOR	(BL1_START_SECTOR+BL1_SECTOR_NUM)
+#define BL2_SECTOR_NUM		(512*1)
+#define BL2_SIZE			(BL2_SECTOR_NUM*SD_SECTOR_SIZE)	/*256*1KB*/
+
+void copy_bl2_to_ram(void)
+{
+/*
+** ch:  通道
+** sb:  起始块
+** bs:  块大小
+** dst: 目的地
+** i: 	是否初始化
+*/
+	u32 OM = *(volatile u32 *)(0xE0000004);	// OM Register
+	OM &= 0x1F;					// 取低5位
+	
+	if (OM == 0xC)		// SD/MMC
+	{
+		u32 S5PV210_SDMMC_BASE = *(volatile u32 *)(0xD0037488);	// S5PV210_SDMMC_BASE
+		u8 ch = 0;
+		/* 参考S5PV210手册7.9.1 SD/MMC REGISTER MAP */
+		if (S5PV210_SDMMC_BASE == 0xEB000000)		// 通道0
+			ch = 0;
+		else if (S5PV210_SDMMC_BASE == 0xEB200000)	// 通道2
+			ch = 2;
+		CopySDMMCtoMem(ch, BL2_START_SECTOR, BL2_SECTOR_NUM, (u32 *)CONFIG_SYS_TEXT_BASE, 0);
+	}
+}
+
 void board_init_f(ulong bootflag)
 {
 	int val;
+	__attribute__((noreturn)) void (*uboot)(void);
+	
 #define DDR_TEST_ADDR 0x40000000 /*0x30000000 -- 0x50000000*/
 #define DDR_TEST_CODE 0xaa
-
-
 	s5pv210_early_debug(0x0);
-
 	writel(DDR_TEST_CODE, DDR_TEST_ADDR);
 	val = readl(DDR_TEST_ADDR);
 	if(val == DDR_TEST_CODE)
@@ -46,9 +84,11 @@ void board_init_f(ulong bootflag)
 	else
 	{
 		s5pv210_early_debug(0x8);
-
 	}
-	while(1);
+	
+	copy_bl2_to_ram();
+	uboot = (void *)CONFIG_SYS_TEXT_BASE;
+	(*uboot)();
 }
 
 void clock_init(void)
