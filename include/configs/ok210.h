@@ -57,7 +57,7 @@
 /*
  * select serial console configuration
  */
-#define CONFIG_SERIAL0			1	/* use SERIAL 0 on OK210 */
+#define CONFIG_SERIAL2			1	/* use SERIAL 0 on OK210 */
 
 /* PWM */
 #define CONFIG_PWM			1
