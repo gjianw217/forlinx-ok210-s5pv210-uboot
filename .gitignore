@@ -1,0 +1,12 @@
+*.o
+*.bin
+*.cfg
+*.dtb
+*.lds
+*.map
+*.srec
+*.sym
+*.cmd
+*.su
+*.tmp
+spi/
