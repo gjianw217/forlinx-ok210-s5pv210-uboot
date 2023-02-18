@@ -69,18 +69,22 @@
 /***********************************************************
  * Command definition
  ***********************************************************/
-#undef CONFIG_CMD_NAND
 
 #define CONFIG_CMD_REGINFO
 #undef CONFIG_CMD_ONENAND
-#define CONFIG_CMD_MTDPARTS
 
-#define CONFIG_BOOTDELAY	3
-
-#define CONFIG_ZERO_BOOTDELAY_CHECK
-
+#define CONFIG_CMD_NAND
+#ifdef CONFIG_CMD_NAND
+#define CONFIG_SYS_MAX_NAND_DEVICE 	1
+#define CONFIG_SYS_NAND_BASE		0xB0E00000
+#define CONFIG_NAND_S5PV210
+#define CONFIG_S5PV210_NAND_HWECC
+#define	CONFIG_SYS_NAND_ECCSIZE		512
+#define CONFIG_SYS_NAND_ECCBYTES	13
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
+
+#endif /*ONFIG_CMD_NAND*/
 
 #define MTDIDS_DEFAULT		"onenand0=s3c-onenand"
 #define MTDPARTS_DEFAULT	"mtdparts=s3c-onenand:256k(bootloader)"\
@@ -93,7 +97,8 @@
 
 
 #define CONFIG_ENV_OVERWRITE
-
+#define CONFIG_ZERO_BOOTDELAY_CHECK
+#define CONFIG_BOOTDELAY	3
 
 /*
  * Miscellaneous configurable options
@@ -130,7 +135,7 @@
 /*-----------------------------------------------------------------------
  * Boot configuration
  */
-#define CONFIG_ENV_IS_NOWHERE
+#define CONFIG_ENV_IS_IN_NAND
 #define CONFIG_ENV_SIZE			(128 << 10)	/* 128KiB, 0x20000 */
 #define CONFIG_ENV_ADDR			(256 << 10)	/* 256KiB, 0x40000 */
 #define CONFIG_ENV_OFFSET		(256 << 10)	/* 256KiB, 0x40000 */
