@@ -14,12 +14,49 @@
 
 DECLARE_GLOBAL_DATA_PTR;
 
+#define GPH2CON   	0xE0200C40
+#define GPH2DAT    	0xE0200C44
+
+#define LED_CON GPH2CON
+#define LED_DAT GPH2DAT
+
+void s5pv210_early_debug(int debug_code)
+{
+	if(debug_code > 0xf)
+		debug_code = 0;
+	writel(0x1111, LED_CON);
+	writel(~(~0&debug_code), LED_DAT);
+}
+
 #ifdef CONFIG_SPL_BUILD
  
 void board_init_f(ulong bootflag)
 {
+	int val;
+#define DDR_TEST_ADDR 0x40000000 /*0x30000000 -- 0x50000000*/
+#define DDR_TEST_CODE 0xaa
+
+
+	s5pv210_early_debug(0x0);
+
+	writel(DDR_TEST_CODE, DDR_TEST_ADDR);
+	val = readl(DDR_TEST_ADDR);
+	if(val == DDR_TEST_CODE)
+		s5pv210_early_debug(0x1);
+	else
+	{
+		s5pv210_early_debug(0x8);
+
+	}
+	while(1);
+}
+
+void clock_init(void)
+{
+	u32 val = 0;
 	
 }
+
  
 #endif
 

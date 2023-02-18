@@ -22,7 +22,7 @@ lowlevel_init:
 
 	#ifdef CONFIG_SPL_BUILD
 	bl system_clock_init
-	
+	bl sdram_init
 	#else
 	
 	
