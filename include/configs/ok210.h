@@ -71,8 +71,6 @@
  ***********************************************************/
 
 #define CONFIG_CMD_REGINFO
-#undef CONFIG_CMD_ONENAND
-
 #define CONFIG_CMD_NAND
 #ifdef CONFIG_CMD_NAND
 #define CONFIG_SYS_MAX_NAND_DEVICE 	1
@@ -81,17 +79,23 @@
 #define CONFIG_S5PV210_NAND_HWECC
 #define	CONFIG_SYS_NAND_ECCSIZE		512
 #define CONFIG_SYS_NAND_ECCBYTES	13
+#define CONFIG_CMD_MTDPARTS
 #define CONFIG_MTD_DEVICE
 #define CONFIG_MTD_PARTITIONS
 
 #endif /*ONFIG_CMD_NAND*/
 
-#define MTDIDS_DEFAULT		"onenand0=s3c-onenand"
-#define MTDPARTS_DEFAULT	"mtdparts=s3c-onenand:256k(bootloader)"\
-				",128k@0x40000(params)"\
-				",3m@0x60000(kernel)"\
-				",16m@0x360000(test)"\
-				",-(UBI)"
+#define MTDIDS_DEFAULT		"nand0=s5p-nand"
+#define MTDPARTS_DEFAULT	"mtdparts=s5p-nand:1m(bootloader)"\
+				",512k(params)"\
+				",512k(dtb)"\
+				",4m(kernel)"\
+				",10m(ramdisk)"\
+				",15m(cramfs)"\
+				",40m(jffs2)"\
+				",40m(yaffs2)"\
+				",40m(ubifs)"\
+				",-(data)"
 
 #define NORMAL_MTDPARTS_DEFAULT MTDPARTS_DEFAULT
 
