@@ -22,7 +22,7 @@
 #define CONFIG_SYS_CLK_FREQ_C110	24000000
 
 /* DRAM Base */
-#define CONFIG_SYS_SDRAM_BASE		0x20000000
+#define CONFIG_SYS_SDRAM_BASE		0x30000000
 
 /* Text Base */
 
@@ -124,9 +124,8 @@
 		"set bootargs " CONFIG_RAMDISK_BOOT \
 		"initrd=0x33000000,8M ramdisk=8192\0" \
 	"mmcboot=" \
-		"set bootargs root=/dev/mmcblk${mmcdev}p${mmcrootpart} " \
-		"rootfstype=${rootfstype} ${opts} ${lcdinfo} " \
-		CONFIG_COMMON_BOOT "; run bootk\0" \
+		"set bootargs console=ttySAC2,115200n8 root=/dev/mmcblk0p2 rw rootwait ignore_loglevel earlyprintk " \
+		"; fatload mmc 0 30008000 uImage;fatload mmc 0 30500000 xboard.dtb;bootm 30008000 - 30500000\0" \
 	"boottrace=setenv opts initcall_debug; run bootcmd\0" \
 	"bootchart=set opts init=/sbin/bootchartd; run bootcmd\0" \
 	"verify=n\0" \
@@ -150,14 +149,17 @@
 
 // dm9000 eth
 #define CONFIG_DRIVER_DM9000		1
-#define CONFIG_DM9000_BASE		0x80000000
-#define CONFIG_ETHADDR			"b2:2c:7c:04:74:43"
+#define CONFIG_DM9000_BASE		0x88000000 /*SROM BANK 1*/
+#define CONFIG_ETHADDR			"0d:0e:0d:0e:0d:0e"
 #define DM9000_IO			CONFIG_DM9000_BASE
 #define DM9000_DATA			(CONFIG_DM9000_BASE + 4)
 
 // gblw210只有一个bank 有512M内存
+//#define CONFIG_NR_DRAM_BANKS 2
 #define PHYS_SDRAM_1		CONFIG_SYS_SDRAM_BASE	/* OneDRAM Bank #0 */
-#define PHYS_SDRAM_1_SIZE	(512 << 20)		/* 512 MB in Bank #0 */
+#define PHYS_SDRAM_1_SIZE	(256 << 20)		/* 512 MB in Bank #0 */
+#define PHYS_SDRAM_2		(CONFIG_SYS_SDRAM_BASE+PHYS_SDRAM_1_SIZE)	/* OneDRAM Bank #0 */
+#define PHYS_SDRAM_2_SIZE	(256 << 20)		/* 512 MB in Bank #0 */
 
 #define CONFIG_SYS_MONITOR_BASE		0x00000000
 #define CONFIG_SYS_MONITOR_LEN		(256 << 10)	/* 256 KiB */

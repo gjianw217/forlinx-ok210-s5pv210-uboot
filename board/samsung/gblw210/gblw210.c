@@ -50,7 +50,7 @@ void i2c_init_board(void)
 
 int dram_init(void)
 {
-	gd->ram_size = PHYS_SDRAM_1_SIZE;
+	gd->ram_size = PHYS_SDRAM_1_SIZE+ PHYS_SDRAM_2_SIZE;
 	return 0;
 }
 
@@ -58,6 +58,8 @@ int dram_init_banksize(void)
 {
 	gd->bd->bi_dram[0].start = PHYS_SDRAM_1;
 	gd->bd->bi_dram[0].size = PHYS_SDRAM_1_SIZE;
+	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
+	gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
 	return 0;
 }
 
@@ -103,13 +105,16 @@ int board_mmc_init(struct bd_info *bis)
 #endif
 
 #ifdef CONFIG_DRIVER_DM9000
+#define SROM_BW 0xE8000000
+#define SROM_BC0 0xE8000004
+#define SROM_BC1 0xE8000008
 int board_eth_init(struct bd_info *bis)
 {
 	unsigned int tmp;
 
 	// config dm9000 sromc
 	// HCLK MSYS = 200MHz 5ns
-	*((volatile unsigned int *)0xE8000004) =  // srom bc0
+	*((volatile unsigned int *)SROM_BC1) =  // srom bc1
 		  (0 << 28)   // Adress set-up before nGCS
 											 // 发出片选信号之前,多长时间内要先发出地址信号
 											 // DM9000C的片选信号和CMD信号可以同时发出, 所以它设为0
@@ -127,10 +132,10 @@ int board_eth_init(struct bd_info *bis)
 		  | (0 << 4) // Page mode access cycle @ Page mode
 		  | (0 << 0); // Page mode configuration
 
-	tmp = *((volatile unsigned int *)0xE8000000); // read srom bw
-	tmp &= ~0x0000000F; // 重置bank0设置
-	tmp |=  0x00000003; // byte base address, 16bit
-	*((volatile unsigned int *)0xE8000000) = tmp; // write srom bw
+	tmp = *((volatile unsigned int *)SROM_BW); // read srom bw
+	tmp &= ~0x000000F0; // 重置bank1设置
+	tmp |=  0x00000030; // byte base address, 16bit
+	*((volatile unsigned int *)SROM_BW) = tmp; // write srom bw
 
 	return dm9000_initialize(bis);
 }

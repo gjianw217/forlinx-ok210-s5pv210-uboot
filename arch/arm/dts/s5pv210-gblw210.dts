@@ -15,8 +15,8 @@
 	compatible = "gblw210", "samsung,s5pv210";
 
 	aliases {
-		serial0 = "/serial@e2900000";
-		console = "/serial@e2900000";
+		serial2 = "/serial@e2900800";
+		console = "/serial@e2900800";
 		mmc0 = "/mmc@eb000000";
 		pinctrl0 = &pinctrl0;
 	};
@@ -26,10 +26,10 @@
 		reg = <0xe0200000 0x1000>;
 	};
 
-	serial@e2900000 {
+	serial@e2900800 {
 		compatible = "samsung,exynos4210-uart";
-		reg = <0xe2900000 0x400>;
-		id = <0>;
+		reg = <0xe2900800 0x400>;
+		id = <2>;
 	};
 
 	mmc@eb000000 {
