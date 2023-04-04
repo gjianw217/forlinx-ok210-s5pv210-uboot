@@ -33,6 +33,9 @@ hostprogs-$(CONFIG_LCD_LOGO) += bmp_logo
 hostprogs-$(CONFIG_VIDEO_LOGO) += bmp_logo
 HOSTCFLAGS_bmp_logo.o := -pedantic
 
+hostprogs-y += mkmini210
+HOSTCFLAGS_mkmini210.o := -pedantic
+
 hostprogs-$(CONFIG_BUILD_ENVCRC) += envcrc
 envcrc-objs := envcrc.o lib/crc32.o env/embedded.o lib/sha1.o
 
