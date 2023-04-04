@@ -124,8 +124,8 @@
 		"set bootargs " CONFIG_RAMDISK_BOOT \
 		"initrd=0x33000000,8M ramdisk=8192\0" \
 	"mmcboot=" \
-		"set bootargs console=ttySAC2,115200n8 root=/dev/mmcblk0p2 rw rootwait ignore_loglevel earlyprintk " \
-		"; fatload mmc 0 30008000 uImage;fatload mmc 0 30500000 xboard.dtb;bootm 30008000 - 30500000\0" \
+		"setenv bootargs console=ttySAC2,115200n8 root=/dev/mmcblk0p2 rw rootwait ignore_loglevel earlyprintk " \
+		"; fatload mmc 0 30008000 uImage;fatload mmc 0 30500000 s5pv210-ok210.dtb;bootm 30008000 - 30500000\0" \
 	"boottrace=setenv opts initcall_debug; run bootcmd\0" \
 	"bootchart=set opts init=/sbin/bootchartd; run bootcmd\0" \
 	"verify=n\0" \
