@@ -1,0 +1,16 @@
+*.o
+*.cmd
+*.su
+*.tmp
+.binman_stamp
+.config
+.config.old
+System.map
+*.dtb
+arch/arm/lib/asm-offsets.s
+lib/asm-offsets.s
+*.a
+include/config/
+include/generated/
+scripts/
+u-boot*
